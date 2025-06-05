@@ -1,6 +1,7 @@
 <template>
     <svg
         :class="className"
+        :style="{ scale: size / 30 }"
         class="icon"
         width="25"
         height="30"
@@ -24,8 +25,9 @@
 </template>
 
 <script setup>
-const { className } = defineProps({
+const { className, size = 30 } = defineProps({
     className: String,
+    size: Number,
 });
 </script>
 

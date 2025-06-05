@@ -6,6 +6,7 @@
     --color-primary-inverted: #000000;
 
     --color-bg-card: #272e37;
+    --color-card-hover: #3a434f;
 
     --color-bg-main: #222831;
     --color-text-placeholder: #3f4958;
@@ -18,6 +19,11 @@
 
 * {
     box-sizing: border-box;
+    margin: 0;
+}
+
+button {
+    border: none;
 }
 
 ul {

@@ -1,8 +1,13 @@
 <template>
-    <input class="input" />
+    <input
+        v-model="data"
+        class="input"
+    />
 </template>
 
-<script setup></script>
+<script setup>
+const data = defineModel({ type: String, required: true });
+</script>
 
 <style lang="scss" scoped>
 .input {

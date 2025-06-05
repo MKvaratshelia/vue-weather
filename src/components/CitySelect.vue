@@ -5,8 +5,11 @@
             class="city-select__input"
         >
             <Input
+                v-model="inputvalue"
+                v-focus
                 placeholder="Введите город"
                 type="text"
+                @keyup.enter="select"
             />
             <Button @click="select">Сохранить</Button>
         </div>
@@ -21,18 +24,17 @@
 <script setup>
 import IconLocation from "../icons/IconLocation.vue";
 import Button from "./Button.vue";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import Input from "./Input.vue";
+import { cityProvider } from "../constants";
 const isEdited = ref(false);
-const emit = defineEmits({
-    selectCity(payload) {
-        return payload;
-    },
-});
+
+const city = inject(cityProvider);
+const inputvalue = ref(city.value);
 
 function select() {
     isEdited.value = false;
-    emit("selectCity", "london");
+    city.value = inputvalue.value;
 }
 
 function edit() {

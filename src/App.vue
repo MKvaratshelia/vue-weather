@@ -1,54 +1,88 @@
 <script setup>
-import CitySelect from "./components/CitySelect.vue";
-import Stat from "./components/Stat.vue";
-import { computed, ref } from "vue";
+import { onMounted, provide, ref, watch } from "vue";
+import LeftPanel from "./components/Leftpanel.vue";
+import RightPanel from "./components/RightPanel.vue";
+import { cityProvider, API_ENDPOINT } from "./constants";
 
-function getCity(city) {
-    city;
+const data = ref(null);
+const error = ref(null);
+const activeIndex = ref(0);
+const city = ref("Москва");
+
+provide(cityProvider, city);
+
+watch(city, () => {
+    getCity(city.value);
+});
+
+onMounted(() => {
+    getCity(city.value);
+});
+
+async function getCity(city) {
+    const params = new URLSearchParams({
+        q: city,
+        lang: "ru",
+        key: "5bb70e65fc754c21822185440250306",
+        days: 3,
+    });
+
+    const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`);
+
+    if (res.status !== 200) {
+        error.value = await res.json();
+        data.value = null;
+        return;
+    }
+    error.value = null;
+    data.value = await res.json();
 }
-const data = ref({
-    humidity: 90,
-    rain: 0,
-    wind: 3,
-});
-
-const dataModified = computed(() => {
-    return [
-        { label: "ВЛАЖНОСТЬ", stat: `${data.value.humidity}%` },
-        { label: "ОСАДКИ", stat: `${data.value.rain}%` },
-        { label: "ВЕТЕР", stat: `${data.value.wind} м/ч` },
-    ];
-});
 </script>
 
 <template>
     <main class="main">
-        <ul class="list">
-            <li
-                v-for="item in dataModified"
-                :key="item.label"
-            >
-                <Stat v-bind="item" />
-            </li>
-        </ul>
-
-        <CitySelect @select-city="getCity" />
+        <div class="left">
+            <LeftPanel
+                v-if="data"
+                :day-data="data?.forecast.forecastday[activeIndex]"
+            />
+        </div>
+        <div class="right">
+            <RightPanel
+                v-if="data"
+                :active-index="activeIndex"
+                :data
+                :error
+                @select-index="(i) => (activeIndex = i)"
+            />
+        </div>
     </main>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .main {
+    display: flex;
+    align-items: center;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 66px;
+    padding: 48px 32px 64px;
+    width: 490px;
+    height: 666px;
+    border-radius: 30px;
+    color: var(--color-primary);
+    background: var(--gradient);
+}
+.right {
+    position: relative;
     display: flex;
     flex-direction: column;
     background-color: var(--color-bg-main);
     padding: 60px 50px;
-    border-radius: 25px;
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 70px;
+    border-radius: 0 25px 25px 0;
 }
 </style>
